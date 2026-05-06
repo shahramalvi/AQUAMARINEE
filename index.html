@@ -1,9 +1,9 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>AQUAMARINE � Beyond The Horizon</title>
+<title>AQUAMARINE &mdash; Beyond The Horizon</title>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
 <style>
@@ -28,6 +28,7 @@
    ============================================= */
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 html { scroll-behavior: smooth; cursor: none; overflow-x: hidden; }
+@media (pointer: coarse) { html { cursor: auto !important; } }
 body {
   background: var(--bg);
   color: var(--text);
@@ -291,7 +292,7 @@ body::after {
 .hero-img {
   position: absolute;
   inset: 0;
-  background: url('ship-hero.jpg') center/cover no-repeat;
+  background: url('ray-harrington-ws3uVPh9wm4-unsplash.jpg') center/cover no-repeat;
   transform-origin: center center;
   animation: ken-burns 22s ease-in-out infinite alternate;
   will-change: transform;
@@ -648,7 +649,15 @@ body::after {
    ============================================= */
 .gallery-section { padding:130px 0; position:relative; z-index:1; overflow:hidden; }
 .gallery-header { padding:0 56px; max-width:1440px; margin:0 auto 64px; }
-.gallery-wrap { position:relative; overflow:hidden; }
+.gallery-wrap {
+  position: relative;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.gallery-wrap::-webkit-scrollbar { display: none; }
 .gallery-wrap::before, .gallery-wrap::after {
   content:''; position:absolute; top:0; bottom:0; width:220px; z-index:10; pointer-events:none;
 }
@@ -658,7 +667,6 @@ body::after {
   display: flex;
   gap: 22px;
   padding: 0 56px;
-  transition: transform .85s cubic-bezier(.25,.46,.45,.94);
 }
 .suite-card {
   flex-shrink: 0;
@@ -668,6 +676,7 @@ body::after {
   overflow: hidden;
   position: relative;
   cursor: none;
+  scroll-snap-align: start;
   transition: transform .55s cubic-bezier(.25,.46,.45,.94);
 }
 .suite-card:hover { transform: scale(1.025) translateY(-10px); }
@@ -715,7 +724,8 @@ body::after {
 
 /* Carousel nav */
 .car-nav { display:flex; align-items:center; gap:14px; padding:44px 56px 0; max-width:1440px; margin:0 auto; }
-.car-btn {
+.car-btn { display: none; }
+.car-btn-hidden {
   width:54px; height:54px; border-radius:50%;
   border:1px solid var(--border); background:transparent;
   display:flex; align-items:center; justify-content:center;
@@ -958,27 +968,86 @@ footer {
   100% { opacity: 1; }
 }
 
+/* Touch devices: kill custom cursor entirely */
+@media (pointer: coarse) {
+  #cursor, #cursor-ring { display: none !important; }
+  html { cursor: auto !important; }
+  a, button, .suite-card, .exp-item, .bcard,
+  .car-btn, .car-dot, .foot-social, .nav-btn,
+  .btn-fill, .btn-ghost { cursor: pointer !important; }
+}
+
+/* Mobile layout */
 @media(max-width:900px) {
-  #navbar { padding:22px 28px; }
-  #navbar.solid { padding:15px 28px; }
+  /* Navbar */
+  #navbar { padding:20px 24px; }
+  #navbar.solid { padding:14px 24px; }
   .nav-links { display:none; }
-  .hero-inner { padding:0 28px; }
+
+  /* Hero — centre content, push it to upper half */
+  .hero {
+    align-items: center;
+    padding-top: 110px;
+    padding-bottom: 48px;
+    min-height: 100svh;
+  }
+  .hero-inner { padding:0 24px; }
+  .hero-title { font-size: clamp(52px, 14vw, 80px); margin-bottom:24px; }
+  .hero-sub {
+    font-size: 14px;
+    max-width: 100%;
+    margin-bottom: 36px;
+    line-height: 1.7;
+  }
+  .hero-btns { gap:10px; flex-wrap:wrap; }
   .hero-stats { display:none; }
-  .section-wrap { padding:90px 28px; }
-  .bento { grid-template-columns:1fr; }
+  .scroll-hint { display:none; }
+
+  /* Sections */
+  .section-wrap { padding:72px 24px; }
+  .sec-title { font-size: clamp(32px, 8vw, 48px); }
+
+  /* Bento */
+  .bento { grid-template-columns:1fr; gap:12px; }
   .b-span-7,.b-span-5,.b-span-4,.b-span-8,.b-span-12 { grid-column:span 1; }
-  .b-row-2 { min-height:340px; }
-  .exp-grid { grid-template-columns:1fr; }
-  .exp-inner { padding:90px 28px; }
-  .foot-grid { grid-template-columns:1fr 1fr; gap:40px; }
-  .gallery-header { padding:0 28px; }
-  .car-nav { padding:36px 28px 0; }
-  .gallery-track { padding:0 28px; }
-  .cta-wrap { padding:0 16px 90px; }
-  .cta-box { border-radius:22px; }
-  .cta-bg-img { border-radius:22px; }
-  .cta-content { padding:60px 28px; }
-  footer { padding:60px 28px 36px; }
+  .b-row-2 { min-height:300px; }
+  .bcard-inner { padding:28px; }
+  .pricing-inner { flex-direction:column !important; align-items:flex-start !important; }
+
+  /* Gallery */
+  .gallery-section { padding:72px 0; }
+  .gallery-header { padding:0 24px; margin-bottom:40px; }
+  .gallery-track { padding:0 24px; gap:16px; }
+  .suite-card { width:300px; }
+  .car-nav { padding:28px 24px 0; }
+
+  /* Experience */
+  .exp-grid { grid-template-columns:1fr; gap:48px; }
+  .exp-inner { padding:72px 24px; }
+  .exp-visual { aspect-ratio:4/3; }
+  .exp-img-a { width:88%; height:88%; }
+  .exp-img-b { width:50%; height:44%; }
+  .exp-list { gap:12px; }
+  .exp-item { padding:20px; }
+
+  /* CTA */
+  .cta-wrap { padding:0 14px 72px; }
+  .cta-box { border-radius:20px; min-height:auto; }
+  .cta-bg-img { border-radius:20px; }
+  .cta-content { padding:64px 24px; }
+  .cta-title { font-size: clamp(32px, 8vw, 52px); }
+  .cta-btns { flex-direction:column; align-items:center; }
+  .btn-fill, .btn-ghost { width:100%; text-align:center; justify-content:center; }
+
+  /* Footer */
+  .foot-grid { grid-template-columns:1fr; gap:36px; }
+  footer { padding:52px 24px 32px; }
+  .foot-bottom { flex-direction:column; gap:16px; text-align:center; }
+  .foot-legal { justify-content:center; }
+
+  /* Ticker font */
+  .tick-num { font-size:20px; }
+  .tick-lbl { font-size:9px; }
 }
 </style>
 </head>
@@ -1031,7 +1100,7 @@ footer {
       <span class="title-line"><span class="title-word" id="tw0">Royal</span></span>
       <span class="title-line"><span class="title-word title-shimmer" id="tw1">Penthouse</span></span>
     </h1>
-    <p class="hero-sub" id="heroSub">Experience the pinnacle of maritime luxury � 1,200 square feet of masterfully crafted living space, a private wrap-around terrace, and unmatched panoramic views above the endless horizon.</p>
+    <p class="hero-sub" id="heroSub">Experience the pinnacle of maritime luxury &mdash; 1,200 square feet of masterfully crafted living space, a private wrap-around terrace, and unmatched panoramic views above the endless horizon.</p>
     <div class="hero-btns" id="heroBtns">
       <a href="#" class="btn-fill mag">Reserve Now</a>
       <a href="#" class="btn-ghost mag">Explore Suites</a>
@@ -1041,7 +1110,7 @@ footer {
   <div class="hero-stats" id="heroStats">
     <div><div class="h-stat-num">1,200</div><div class="h-stat-lbl">Sq. Ft.</div></div>
     <div><div class="h-stat-num">Deck 14</div><div class="h-stat-lbl">Level</div></div>
-    <div><div class="h-stat-num">360�</div><div class="h-stat-lbl">Ocean View</div></div>
+    <div><div class="h-stat-num">360&deg;</div><div class="h-stat-lbl">Ocean View</div></div>
   </div>
 
   <div class="scroll-hint" id="scrollHint">
@@ -1113,9 +1182,9 @@ footer {
         <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
           <div>
             <h3 class="bcard-title">Deck Plan</h3>
-            <p class="bcard-desc">Penthouse Level � Deck 14</p>
+            <p class="bcard-desc">Penthouse Level &middot; Deck 14</p>
           </div>
-          <span style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);padding:6px 14px;border:1px solid rgba(0,251,251,.2);border-radius:100px;white-space:nowrap;">? LIVE</span>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);padding:6px 14px;border:1px solid rgba(0,251,251,.2);border-radius:100px;white-space:nowrap;">&#9679; LIVE</span>
         </div>
         <div style="flex:1;display:flex;align-items:center;justify-content:center;">
           <div style="width:100%;aspect-ratio:2/1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;position:relative;overflow:hidden;padding:14px;">
@@ -1159,11 +1228,11 @@ footer {
 
     <!-- Pricing card -->
     <div class="bcard b-span-12 rv" style="background:linear-gradient(135deg,rgba(0,251,251,.07),rgba(0,251,251,.02));border-color:rgba(0,251,251,.14);">
-      <div class="bcard-inner" style="flex-direction:row;align-items:center;justify-content:space-between;gap:28px;">
+      <div class="bcard-inner pricing-inner" style="flex-direction:row;align-items:center;justify-content:space-between;gap:28px;">
         <div>
           <span style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:12px;">Starting From</span>
           <div style="font-family:'Cormorant Garamond',serif;font-size:62px;font-weight:600;color:#fff;line-height:1;">$12,500<span style="font-size:22px;color:var(--muted);"> /pp</span></div>
-          <p style="font-size:13px;color:var(--muted);margin-top:8px;">7-night minimum � All-inclusive � Private airport transfer</p>
+          <p style="font-size:13px;color:var(--muted);margin-top:8px;">7-night minimum &middot; All-inclusive &middot; Private airport transfer</p>
         </div>
         <a href="#" class="btn-fill mag" style="flex-shrink:0;white-space:nowrap;">Reserve Penthouse</a>
       </div>
@@ -1174,18 +1243,18 @@ footer {
 <div class="wave-sep">
   <div class="wave-layer wave-layer-1">
     <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,36 C180,58 360,14 540,36 C720,58 900,14 1080,36 C1260,58 1350,46 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.08)"/>
+      <path d="M0,36 C180,58 360&deg;14 540,36 C720,58 900,14 1080,36 C1260,58 1350,46 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.08)"/>
     </svg>
     <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,36 C180,58 360,14 540,36 C720,58 900,14 1080,36 C1260,58 1350,46 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.08)"/>
+      <path d="M0,36 C180,58 360&deg;14 540,36 C720,58 900,14 1080,36 C1260,58 1350,46 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.08)"/>
     </svg>
   </div>
   <div class="wave-layer wave-layer-2">
     <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,36 C180,14 360,58 540,36 C720,14 900,58 1080,36 C1260,14 1350,26 1440,36 L1440,72 L0,72 Z" fill="rgba(177,200,233,0.05)"/>
+      <path d="M0,36 C180,14 360&deg;58 540,36 C720,14 900,58 1080,36 C1260,14 1350,26 1440,36 L1440,72 L0,72 Z" fill="rgba(177,200,233,0.05)"/>
     </svg>
     <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
-      <path d="M0,36 C180,14 360,58 540,36 C720,14 900,58 1080,36 C1260,14 1350,26 1440,36 L1440,72 L0,72 Z" fill="rgba(177,200,233,0.05)"/>
+      <path d="M0,36 C180,14 360&deg;58 540,36 C720,14 900,58 1080,36 C1260,14 1350,26 1440,36 L1440,72 L0,72 Z" fill="rgba(177,200,233,0.05)"/>
     </svg>
   </div>
 </div>
@@ -1328,7 +1397,7 @@ footer {
           <div class="exp-icon"><span class="material-symbols-outlined">anchor</span></div>
           <div>
             <h3 class="exp-item-title">Shore Excursions</h3>
-            <p class="exp-item-desc">Curated private tours in each port � Santorini, the Norwegian fjords, and beyond.</p>
+            <p class="exp-item-desc">Curated private tours in each port &mdash; Santorini, the Norwegian fjords, and beyond.</p>
           </div>
         </div>
       </div>
@@ -1340,7 +1409,7 @@ footer {
 <div class="cta-wrap">
   <div class="cta-box rv scale">
     <div class="cta-bg-img"></div>
-    <div class="cta-ribbon">Limited Availability � 2026 Season</div>
+    <div class="cta-ribbon">Limited Availability &mdash; 2026 Season</div>
     <div class="cta-content">
       <h2 class="cta-title">Your next chapter begins beyond the horizon</h2>
       <p class="cta-sub">The 2026 season has very limited Royal Penthouse availability. Secure your voyage or join the priority waitlist.</p>
@@ -1348,7 +1417,7 @@ footer {
         <a href="#" class="btn-fill mag">Secure Your Voyage</a>
         <a href="#" class="btn-ghost mag">Join Waitlist</a>
       </div>
-      <div class="cta-price">From <span>$12,500</span> per person � 7 nights</div>
+      <div class="cta-price">From <span>$12,500</span> per person &middot; 7 nights</div>
     </div>
   </div>
 </div>
@@ -1394,7 +1463,7 @@ footer {
     </div>
   </div>
   <div class="foot-bottom">
-    <p class="foot-copy">� 2026 AQUAMARINE MARITIME VENTURES. ALL RIGHTS RESERVED.</p>
+    <p class="foot-copy">&copy; 2026 AQUAMARINE MARITIME VENTURES. ALL RIGHTS RESERVED.</p>
     <div class="foot-legal">
       <a href="#">Privacy</a>
       <a href="#">Terms</a>
@@ -1446,30 +1515,32 @@ footer {
 })();
 
 // ============================================================
-// CUSTOM CURSOR
+// CUSTOM CURSOR (desktop / fine pointer only)
 // ============================================================
-const cursor = document.getElementById('cursor');
-const ring   = document.getElementById('cursor-ring');
-let mx = 0, my = 0, rx = 0, ry = 0;
+if (window.matchMedia('(pointer: fine)').matches) {
+  const cursor = document.getElementById('cursor');
+  const ring   = document.getElementById('cursor-ring');
+  let mx = 0, my = 0, rx = 0, ry = 0;
 
-document.addEventListener('mousemove', e => {
-  mx = e.clientX; my = e.clientY;
-  cursor.style.left = mx + 'px';
-  cursor.style.top  = my + 'px';
-});
+  document.addEventListener('mousemove', e => {
+    mx = e.clientX; my = e.clientY;
+    cursor.style.left = mx + 'px';
+    cursor.style.top  = my + 'px';
+  });
 
-(function animRing() {
-  rx += (mx - rx) * .11;
-  ry += (my - ry) * .11;
-  ring.style.left = rx + 'px';
-  ring.style.top  = ry + 'px';
-  requestAnimationFrame(animRing);
-})();
+  (function animRing() {
+    rx += (mx - rx) * .11;
+    ry += (my - ry) * .11;
+    ring.style.left = rx + 'px';
+    ring.style.top  = ry + 'px';
+    requestAnimationFrame(animRing);
+  })();
 
-document.querySelectorAll('a, button, .suite-card, .exp-item, .bcard').forEach(el => {
-  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
-  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
-});
+  document.querySelectorAll('a, button, .suite-card, .exp-item, .bcard').forEach(el => {
+    el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+    el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+  });
+}
 
 // ============================================================
 // SCROLL PROGRESS + NAVBAR
@@ -1526,22 +1597,70 @@ document.querySelectorAll('.bcard').forEach(card => {
 });
 
 // ============================================================
-// SUITE CAROUSEL
+// SUITE GALLERY — free scroll + auto-scroll
 // ============================================================
-const galTrack = document.getElementById('galTrack');
-const dotEls   = document.querySelectorAll('.car-dot');
-const CARD_W   = 390 + 22; // width + gap
-let slide = 0;
-const total = document.querySelectorAll('.suite-card').length;
+(function () {
+  const wrap   = document.querySelector('.gallery-wrap');
+  const track  = document.getElementById('galTrack');
+  const dotEls = document.querySelectorAll('.car-dot');
+  const cards  = document.querySelectorAll('.suite-card');
 
-function setSlide(n) {
-  slide = (n + total) % total;
-  galTrack.style.transform = `translateX(${-slide * CARD_W}px)`;
-  dotEls.forEach((d, i) => d.classList.toggle('on', i === slide));
-}
-document.getElementById('carNext').addEventListener('click', () => setSlide(slide + 1));
-document.getElementById('carPrev').addEventListener('click', () => setSlide(slide - 1));
-dotEls.forEach((d, i) => d.addEventListener('click', () => setSlide(i)));
+  function cardWidth() {
+    if (!cards[0]) return 412;
+    const gap = parseFloat(getComputedStyle(track).gap) || 22;
+    return cards[0].offsetWidth + gap;
+  }
+
+  function updateDots() {
+    const idx = Math.round(wrap.scrollLeft / cardWidth());
+    dotEls.forEach((d, i) => d.classList.toggle('on', i === idx));
+  }
+
+  function scrollToCard(n) {
+    wrap.scrollTo({ left: n * cardWidth(), behavior: 'smooth' });
+  }
+
+  // Auto-scroll
+  let userActive = false;
+  let resumeTimer = null;
+  let autoTimer = null;
+
+  function startAuto() {
+    stopAuto();
+    autoTimer = setInterval(() => {
+      if (userActive) return;
+      const cw  = cardWidth();
+      const max = wrap.scrollWidth - wrap.clientWidth;
+      const next = wrap.scrollLeft + cw > max + 4 ? 0 : wrap.scrollLeft + cw;
+      wrap.scrollTo({ left: next, behavior: 'smooth' });
+    }, 3000);
+  }
+
+  function stopAuto() {
+    clearInterval(autoTimer);
+    autoTimer = null;
+  }
+
+  function pauseAuto() {
+    userActive = true;
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(() => { userActive = false; }, 3000);
+  }
+
+  wrap.addEventListener('scroll',     updateDots,  { passive: true });
+  wrap.addEventListener('mouseenter', pauseAuto);
+  wrap.addEventListener('mouseleave', () => { userActive = false; });
+  wrap.addEventListener('touchstart', pauseAuto,   { passive: true });
+  wrap.addEventListener('touchend',   () => {
+    clearTimeout(resumeTimer);
+    resumeTimer = setTimeout(() => { userActive = false; }, 3000);
+  });
+
+  dotEls.forEach((d, i) => d.addEventListener('click', () => scrollToCard(i)));
+
+  startAuto();
+  updateDots();
+}());
 
 // ============================================================
 // EXPERIENCE PARALLAX IMAGES
@@ -1559,8 +1678,9 @@ window.addEventListener('scroll', () => {
 }, { passive: true });
 
 // ============================================================
-// MAGNETIC BUTTONS
+// MAGNETIC BUTTONS (desktop only)
 // ============================================================
+if (window.matchMedia('(pointer: fine)').matches)
 document.querySelectorAll('.mag').forEach(btn => {
   btn.addEventListener('mousemove', e => {
     const r = btn.getBoundingClientRect();
@@ -1711,7 +1831,7 @@ document.querySelectorAll('[data-count]').forEach(el => cntObs.observe(el));
   const uActive = gl.getUniformLocation(prog, 'u_active');
 
   gl.enable(gl.BLEND);
-  gl.blendFunc(gl.SRC_ALPHA, gl.ONE); /* additive � brightens image */
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE); /* additive &mdash; brightens image */
 
   let mouseX = 0.5, mouseY = 0.5;
   let targetActive = 0, currentActive = 0;
@@ -1744,8 +1864,9 @@ document.querySelectorAll('[data-count]').forEach(el => cntObs.observe(el));
 })();
 
 // ============================================================
-// WATER RING RIPPLE ON CLICK
+// WATER RING RIPPLE ON CLICK (desktop only — touch has its own feedback)
 // ============================================================
+if (window.matchMedia('(pointer: fine)').matches)
 document.addEventListener('click', e => {
   [0, 1, 2].forEach(i => {
     const el = document.createElement('div');
@@ -1759,3 +1880,4 @@ document.addEventListener('click', e => {
 </script>
 </body>
 </html>
+
