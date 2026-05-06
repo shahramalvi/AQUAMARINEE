@@ -1,0 +1,1761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AQUAMARINE � Beyond The Horizon</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;0,700;1,400;1,600&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
+<style>
+/* =============================================
+   ROOT VARIABLES
+   ============================================= */
+:root {
+  --bg: #060909;
+  --surface: #0c0f0f;
+  --cyan: #00fbfb;
+  --cyan-dim: #00c8c8;
+  --amber: #ffb77d;
+  --blue: #b1c8e9;
+  --text: #e4e5e6;
+  --muted: #6b7280;
+  --border: rgba(255,255,255,0.07);
+  --glass: rgba(255,255,255,0.03);
+}
+
+/* =============================================
+   RESET & BASE
+   ============================================= */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; cursor: none; overflow-x: hidden; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  overflow-x: hidden;
+}
+::selection { background: rgba(0,251,251,0.15); color: var(--cyan); }
+
+.material-symbols-outlined {
+  font-variation-settings: 'FILL' 0, 'wght' 300, 'GRAD' 0, 'opsz' 24;
+  vertical-align: middle;
+  display: inline-flex;
+}
+
+/* =============================================
+   NOISE TEXTURE
+   ============================================= */
+body::after {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='300' height='300' filter='url(%23n)' opacity='0.05'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9990;
+  opacity: 0.35;
+}
+
+/* =============================================
+   CUSTOM CURSOR
+   ============================================= */
+#cursor {
+  width: 10px;
+  height: 10px;
+  background: var(--cyan);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  transform: translate(-50%,-50%);
+  mix-blend-mode: difference;
+  transition: width .25s, height .25s, opacity .25s;
+}
+#cursor-ring {
+  width: 38px;
+  height: 38px;
+  border: 1px solid rgba(0,251,251,0.45);
+  border-radius: 50%;
+  position: fixed;
+  top: 0; left: 0;
+  pointer-events: none;
+  z-index: 9998;
+  transform: translate(-50%,-50%);
+  transition: width .3s, height .3s, border-color .3s;
+}
+.cursor-hover #cursor { width: 22px; height: 22px; background: rgba(0,251,251,0.3); }
+.cursor-hover #cursor-ring { width: 54px; height: 54px; border-color: rgba(0,251,251,0.6); }
+
+/* =============================================
+   SCROLL PROGRESS BAR
+   ============================================= */
+#scroll-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  width: 0%;
+  background: linear-gradient(90deg, var(--cyan), var(--amber), var(--cyan));
+  background-size: 200% auto;
+  animation: bar-shimmer 2s linear infinite;
+  z-index: 1001;
+  transition: width .08s linear;
+}
+@keyframes bar-shimmer {
+  0% { background-position: 0% center; }
+  100% { background-position: 200% center; }
+}
+
+/* =============================================
+   PAGE LOADER
+   ============================================= */
+#loader {
+  position: fixed;
+  inset: 0;
+  background: var(--bg);
+  z-index: 10000;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 28px;
+  clip-path: inset(0 0 0 0);
+  transition: clip-path 1s cubic-bezier(.77,0,.175,1);
+}
+#loader.hide { clip-path: inset(0 0 100% 0); }
+.loader-brand {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(40px, 7vw, 80px);
+  font-weight: 600;
+  letter-spacing: .25em;
+  background: linear-gradient(90deg, rgba(255,255,255,.15), var(--cyan), rgba(255,255,255,.15));
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: shimmer-text 1.4s linear infinite;
+}
+@keyframes shimmer-text {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+.loader-track {
+  width: 180px;
+  height: 1px;
+  background: rgba(255,255,255,.08);
+  overflow: hidden;
+}
+.loader-fill {
+  height: 100%;
+  width: 0;
+  background: var(--cyan);
+  animation: fill-bar 2.2s cubic-bezier(.77,0,.175,1) forwards;
+}
+@keyframes fill-bar {
+  0% { width:0; }
+  55% { width:70%; }
+  100% { width:100%; }
+}
+.loader-num {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .2em;
+  color: var(--muted);
+  font-family: 'Plus Jakarta Sans', monospace;
+}
+
+/* =============================================
+   AMBIENT FLOATING ORBS
+   ============================================= */
+#orbs {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+.orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(90px);
+  opacity: .1;
+  animation: orb-drift var(--d, 18s) ease-in-out infinite;
+  animation-delay: var(--dl, 0s);
+}
+.orb-a { width:700px; height:700px; background:radial-gradient(circle,rgba(0,251,251,.9),transparent); top:-150px; left:-150px; --d:22s; }
+.orb-b { width:500px; height:500px; background:radial-gradient(circle,rgba(177,200,233,.8),transparent); top:35%; right:-100px; --d:28s; --dl:-8s; }
+.orb-c { width:550px; height:550px; background:radial-gradient(circle,rgba(255,183,125,.6),transparent); bottom:15%; left:25%; --d:24s; --dl:-14s; }
+@keyframes orb-drift {
+  0%,100% { transform:translate(0,0) scale(1); }
+  25% { transform:translate(50px,-70px) scale(1.07); }
+  50% { transform:translate(-35px,40px) scale(.94); }
+  75% { transform:translate(60px,50px) scale(1.04); }
+}
+
+/* =============================================
+   NAVBAR
+   ============================================= */
+#navbar {
+  position: fixed;
+  top: 0; width: 100%;
+  z-index: 500;
+  padding: 32px 56px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  transition: padding .5s cubic-bezier(.25,.46,.45,.94), background .5s, backdrop-filter .5s;
+}
+#navbar.solid {
+  padding: 18px 56px;
+  background: rgba(6,9,9,.88);
+  backdrop-filter: blur(32px);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 22px;
+  font-weight: 600;
+  letter-spacing: .18em;
+  color: #fff;
+  text-decoration: none;
+  position: relative;
+}
+.nav-logo::after {
+  content:''; position:absolute;
+  bottom:-3px; left:0; width:0; height:1px;
+  background:var(--cyan);
+  transition: width .4s cubic-bezier(.25,.46,.45,.94);
+}
+.nav-logo:hover::after { width:100%; }
+.nav-links { display:flex; gap:44px; list-style:none; }
+.nav-link {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-decoration: none;
+  position: relative;
+  padding-bottom: 3px;
+  transition: color .3s;
+}
+.nav-link::after {
+  content:''; position:absolute;
+  bottom:0; left:0; width:0; height:1px;
+  background:var(--cyan);
+  transition: width .35s cubic-bezier(.25,.46,.45,.94);
+}
+.nav-link:hover, .nav-link.active { color: var(--cyan); }
+.nav-link:hover::after, .nav-link.active::after { width:100%; }
+.nav-btn {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--cyan);
+  border: none;
+  padding: 13px 30px;
+  border-radius: 100px;
+  cursor: none;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+  display: inline-flex;
+  align-items: center;
+  transition: box-shadow .3s, transform .2s;
+}
+.nav-btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: rgba(255,255,255,.35);
+  transform: translateX(-100%) skewX(-18deg);
+  transition: transform .45s cubic-bezier(.25,.46,.45,.94);
+}
+.nav-btn:hover::before { transform: translateX(120%) skewX(-18deg); }
+.nav-btn:hover { box-shadow: 0 0 28px rgba(0,251,251,.5); }
+
+/* =============================================
+   HERO
+   ============================================= */
+.hero {
+  position: relative;
+  height: 100vh;
+  min-height: 760px;
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 120px;
+  overflow: hidden;
+}
+.hero-img {
+  position: absolute;
+  inset: 0;
+  background: url('ship-hero.jpg') center/cover no-repeat;
+  transform-origin: center center;
+  animation: ken-burns 22s ease-in-out infinite alternate;
+  will-change: transform;
+}
+@keyframes ken-burns {
+  0% { transform: scale(1.0) translate(0,0); }
+  100% { transform: scale(1.14) translate(-2%,-1.5%); }
+}
+.hero-fog {
+  position: absolute; inset: 0;
+  background: linear-gradient(to bottom,
+    rgba(6,9,9,.3) 0%,
+    rgba(6,9,9,.1) 28%,
+    rgba(6,9,9,.5) 65%,
+    rgba(6,9,9,.99) 100%
+  );
+}
+.hero-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(0,251,251,.025) 1px, transparent 1px),
+                    linear-gradient(90deg, rgba(0,251,251,.025) 1px, transparent 1px);
+  background-size: 72px 72px;
+  mask-image: linear-gradient(to bottom, transparent 0%, rgba(0,0,0,.4) 50%, transparent 100%);
+}
+.hero-inner {
+  position: relative; z-index: 10;
+  max-width: 1440px; margin: 0 auto; padding: 0 56px; width: 100%;
+}
+.hero-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(72px, 10.5vw, 148px);
+  font-weight: 600;
+  line-height: 0.95;
+  letter-spacing: -.03em;
+  color: #fff;
+  margin-bottom: 36px;
+}
+.title-line { display: block; overflow: hidden; }
+.title-word {
+  display: inline-block;
+  transform: translateY(110%);
+  opacity: 0;
+  transition: transform .9s cubic-bezier(.77,0,.175,1), opacity .9s cubic-bezier(.77,0,.175,1);
+}
+.title-word.visible { transform: translateY(0); opacity: 1; }
+.title-shimmer {
+  background: linear-gradient(90deg, var(--cyan) 0%, var(--blue) 40%, var(--amber) 70%, var(--cyan) 100%);
+  background-size: 300% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  animation: gradient-flow 5s linear infinite;
+}
+@keyframes gradient-flow {
+  0% { background-position: 0% center; }
+  100% { background-position: 300% center; }
+}
+.hero-sub {
+  font-size: 16px;
+  line-height: 1.8;
+  color: rgba(255,255,255,.48);
+  max-width: 560px;
+  margin-bottom: 52px;
+  padding-left: 18px;
+  border-left: 2px solid rgba(0,251,251,.35);
+  opacity: 0;
+  transform: translateY(20px);
+}
+.hero-btns {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+  opacity: 0;
+  transform: translateY(20px);
+}
+.hero-stats {
+  position: absolute;
+  right: 56px; bottom: 120px; z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  opacity: 0;
+  transform: translateX(24px);
+  text-align: right;
+}
+.h-stat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 36px;
+  font-weight: 600;
+  color: #fff;
+  line-height: 1;
+  text-align: right;
+}
+.h-stat-lbl {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+  margin-top: 3px;
+}
+.scroll-hint {
+  position: absolute;
+  bottom: 36px; left: 50%;
+  transform: translateX(-50%);
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  opacity: 0;
+}
+.scroll-line {
+  width: 1px; height: 56px;
+  background: linear-gradient(to bottom, rgba(0,251,251,.9), transparent);
+  animation: line-pulse 2s ease-in-out infinite;
+}
+@keyframes line-pulse {
+  0%,100% { transform:scaleY(1); opacity:1; }
+  50% { transform:scaleY(.45); opacity:.3; }
+}
+.scroll-lbl {
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: .18em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+/* =============================================
+   BUTTONS
+   ============================================= */
+.btn-fill {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: var(--bg);
+  background: var(--cyan);
+  padding: 16px 38px;
+  border-radius: 100px;
+  border: none;
+  cursor: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  font-family: inherit;
+  transition: box-shadow .3s, transform .25s;
+}
+.btn-fill:hover { box-shadow: 0 0 45px rgba(0,251,251,.55), 0 0 80px rgba(0,251,251,.2); transform: translateY(-2px); }
+.btn-ghost {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: .1em;
+  line-height: 1;
+  text-transform: uppercase;
+  color: rgba(255,255,255,.65);
+  background: transparent;
+  padding: 16px 38px;
+  border-radius: 100px;
+  border: 1px solid rgba(255,255,255,.14);
+  cursor: none;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-family: inherit;
+  transition: color .3s, border-color .3s, transform .25s;
+}
+.btn-ghost:hover { color:#fff; border-color:rgba(255,255,255,.4); transform:translateY(-2px); }
+
+/* =============================================
+   TICKER BAND
+   ============================================= */
+.ticker {
+  padding: 28px 0;
+  background: rgba(0,251,251,.03);
+  border-top: 1px solid rgba(0,251,251,.08);
+  border-bottom: 1px solid rgba(0,251,251,.08);
+  overflow: hidden;
+  position: relative;
+  z-index: 1;
+}
+.ticker-track {
+  display: flex;
+  gap: 64px;
+  width: max-content;
+  animation: tick 28s linear infinite;
+}
+@keyframes tick { 0%{transform:translateX(0)} 100%{transform:translateX(-50%)} }
+.tick-item { display:flex; align-items:center; gap:14px; white-space:nowrap; }
+.tick-num { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; color:var(--cyan); }
+.tick-lbl { font-size:10px; font-weight:700; letter-spacing:.12em; text-transform:uppercase; color:var(--muted); }
+.tick-sep { width:3px; height:3px; background:rgba(0,251,251,.4); border-radius:50%; align-self:center; flex-shrink:0; }
+
+/* =============================================
+   SECTION COMMON
+   ============================================= */
+.section-wrap { position:relative; z-index:1; padding:130px 56px; max-width:1440px; margin:0 auto; }
+.sec-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: .22em;
+  text-transform: uppercase;
+  color: var(--cyan);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+.sec-label::before { content:''; width:30px; height:1px; background:var(--cyan); }
+.sec-title {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: clamp(38px,4.5vw,68px);
+  font-weight: 600;
+  line-height: 1.1;
+  color: #fff;
+  letter-spacing: -.01em;
+}
+.sec-title em {
+  font-style: italic;
+  background: linear-gradient(90deg, var(--cyan), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+/* =============================================
+   REVEAL SYSTEM
+   ============================================= */
+.rv {
+  opacity: 0;
+  transform: translateY(44px);
+  transition: opacity .85s cubic-bezier(.25,.46,.45,.94),
+              transform .85s cubic-bezier(.25,.46,.45,.94);
+}
+.rv.from-left { transform: translateX(-44px); }
+.rv.from-right { transform: translateX(44px); }
+.rv.scale { transform: scale(.9); }
+.rv.visible { opacity:1; transform:translate(0) scale(1); }
+.rv-d1 { transition-delay:.1s !important; }
+.rv-d2 { transition-delay:.2s !important; }
+.rv-d3 { transition-delay:.3s !important; }
+.rv-d4 { transition-delay:.4s !important; }
+.rv-d5 { transition-delay:.5s !important; }
+
+/* =============================================
+   BENTO GRID
+   ============================================= */
+.bento {
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+  gap: 14px;
+  margin-top: 64px;
+  align-items: stretch;
+}
+.bcard {
+  background: var(--glass);
+  border: 1px solid var(--border);
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  transition: border-color .4s, box-shadow .4s, transform .35s;
+  will-change: transform;
+}
+.bcard::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: radial-gradient(circle at var(--mx,50%) var(--my,50%), rgba(0,251,251,.06), transparent 55%);
+  opacity: 0;
+  transition: opacity .3s;
+  pointer-events: none;
+  z-index: 1;
+}
+.bcard:hover::before { opacity: 1; }
+.bcard:hover {
+  border-color: rgba(0,251,251,.2);
+  box-shadow: 0 24px 64px rgba(0,0,0,.55), 0 0 0 1px rgba(0,251,251,.08);
+  transform: translateY(-5px);
+}
+.bcard-inner { padding:38px; height:100%; display:flex; flex-direction:column; position:relative; z-index:2; }
+.bcard-icon {
+  width:50px; height:50px; min-width:50px; flex-shrink:0;
+  background:rgba(0,251,251,.07);
+  border:1px solid rgba(0,251,251,.14);
+  border-radius:13px;
+  display:flex; align-items:center; justify-content:center;
+  color: var(--cyan);
+  margin-bottom:26px;
+  transition: transform .35s, background .3s;
+  font-size: 22px;
+}
+.bcard:hover .bcard-icon { transform:scale(1.12) rotate(8deg); background:rgba(0,251,251,.14); }
+.bcard-title { font-family:'Cormorant Garamond',serif; font-size:26px; font-weight:600; color:#fff; margin-bottom:10px; }
+.bcard-desc { font-size:14px; line-height:1.65; color:var(--muted); }
+
+/* Bento spans */
+.b-span-7 { grid-column: span 7; }
+.b-span-5 { grid-column: span 5; }
+.b-span-4 { grid-column: span 4; }
+.b-span-8 { grid-column: span 8; }
+.b-span-12 { grid-column: span 12; }
+.b-row-2 { grid-row: span 2; min-height:420px; }
+
+/* Featured bento card */
+.bcard-featured .bcard-img {
+  position: absolute; inset: 0; overflow: hidden;
+}
+.bcard-featured .bcard-img img {
+  width:100%; height:100%; object-fit:cover;
+  transition: transform .9s cubic-bezier(.25,.46,.45,.94);
+}
+.bcard-featured:hover .bcard-img img { transform: scale(1.07); }
+.bcard-featured .bcard-img::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(to top, rgba(6,9,9,.97) 0%, rgba(6,9,9,.3) 55%, transparent 100%);
+}
+.bcard-featured .bcard-inner { justify-content:flex-end; }
+
+/* Stat big number */
+.bstat-num {
+  font-family: 'Cormorant Garamond', serif;
+  font-size: 64px;
+  font-weight: 600;
+  line-height: 1;
+  background: linear-gradient(135deg, var(--cyan), var(--blue));
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+  margin-bottom: 8px;
+}
+
+/* Glow line */
+.glow-line {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--cyan), var(--amber), transparent);
+  background-size: 200% auto;
+  animation: glow-sweep 3.5s linear infinite;
+  opacity: .5;
+  position: relative; z-index: 1;
+}
+@keyframes glow-sweep {
+  0%{background-position:0% center}
+  100%{background-position:200% center}
+}
+
+/* =============================================
+   SUITE GALLERY
+   ============================================= */
+.gallery-section { padding:130px 0; position:relative; z-index:1; overflow:hidden; }
+.gallery-header { padding:0 56px; max-width:1440px; margin:0 auto 64px; }
+.gallery-wrap { position:relative; overflow:hidden; }
+.gallery-wrap::before, .gallery-wrap::after {
+  content:''; position:absolute; top:0; bottom:0; width:220px; z-index:10; pointer-events:none;
+}
+.gallery-wrap::before { left:0; background:linear-gradient(to right, var(--bg), transparent); }
+.gallery-wrap::after { right:0; background:linear-gradient(to left, var(--bg), transparent); }
+.gallery-track {
+  display: flex;
+  gap: 22px;
+  padding: 0 56px;
+  transition: transform .85s cubic-bezier(.25,.46,.45,.94);
+}
+.suite-card {
+  flex-shrink: 0;
+  width: 390px;
+  aspect-ratio: 3/4;
+  border-radius: 26px;
+  overflow: hidden;
+  position: relative;
+  cursor: none;
+  transition: transform .55s cubic-bezier(.25,.46,.45,.94);
+}
+.suite-card:hover { transform: scale(1.025) translateY(-10px); }
+.suite-card img { width:100%; height:100%; object-fit:cover; transition:transform 1.1s cubic-bezier(.25,.46,.45,.94); }
+.suite-card:hover img { transform: scale(1.09); }
+.suite-fog {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(6,9,9,.97) 0%, rgba(6,9,9,.25) 60%, transparent 100%);
+  transition: background .5s;
+}
+.suite-card:hover .suite-fog {
+  background: linear-gradient(to top, rgba(6,9,9,.98) 0%, rgba(6,9,9,.55) 70%, transparent 100%);
+}
+.suite-body {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 32px;
+  transform: translateY(22px);
+  transition: transform .55s cubic-bezier(.25,.46,.45,.94);
+}
+.suite-card:hover .suite-body { transform: translateY(0); }
+.suite-tag {
+  font-size: 8px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  color: var(--cyan); margin-bottom:10px; display:block;
+}
+.suite-name {
+  font-family:'Cormorant Garamond',serif; font-size:28px; font-weight:600; color:#fff; margin-bottom:8px;
+}
+.suite-desc {
+  font-size:13px; color:rgba(255,255,255,.45); line-height:1.55; margin-bottom:20px;
+  opacity:0; transition:opacity .4s .1s;
+}
+.suite-card:hover .suite-desc { opacity:1; }
+.suite-row { display:flex; align-items:center; justify-content:space-between; }
+.suite-price { font-size:13px; font-weight:700; color:#fff; }
+.suite-arrow {
+  width:38px; height:38px; border-radius:50%;
+  background:rgba(0,251,251,.09); border:1px solid rgba(0,251,251,.2);
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink: 0;
+  color:var(--cyan); font-size:19px;
+  transition: background .3s, transform .35s, color .3s;
+}
+.suite-card:hover .suite-arrow { background:var(--cyan); color:var(--bg); transform:rotate(45deg); }
+
+/* Carousel nav */
+.car-nav { display:flex; align-items:center; gap:14px; padding:44px 56px 0; max-width:1440px; margin:0 auto; }
+.car-btn {
+  width:54px; height:54px; border-radius:50%;
+  border:1px solid var(--border); background:transparent;
+  display:flex; align-items:center; justify-content:center;
+  flex-shrink:0;
+  color:rgba(255,255,255,.5); cursor:none; font-size:20px;
+  font-family: inherit;
+  transition:all .3s;
+}
+.car-btn:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(0,251,251,.05); }
+.car-dots { display:flex; gap:7px; }
+.car-dot {
+  width:5px; height:5px; border-radius:50%;
+  background:var(--muted); transition:all .35s; cursor:none;
+}
+.car-dot.on { width:26px; border-radius:3px; background:var(--cyan); }
+
+/* =============================================
+   EXPERIENCE SPLIT
+   ============================================= */
+.exp-section { background:rgba(12,15,15,1); position:relative; z-index:1; }
+.exp-inner { max-width:1440px; margin:0 auto; padding:130px 56px; }
+.exp-grid { display:grid; grid-template-columns:1fr 1fr; gap:90px; align-items:center; margin-top:80px; }
+.exp-visual { position:relative; aspect-ratio:4/5; }
+.exp-img-a {
+  width:82%; height:88%; object-fit:cover; border-radius:22px;
+  position:absolute; top:0; right:0;
+  transition:transform .1s ease-out;
+  box-shadow: 0 40px 80px rgba(0,0,0,.6);
+}
+.exp-img-b {
+  width:52%; height:48%; object-fit:cover; border-radius:18px;
+  position:absolute; bottom:0; left:0;
+  border:4px solid var(--bg);
+  box-shadow: 0 24px 60px rgba(0,0,0,.5);
+  transition:transform .1s ease-out;
+}
+.exp-badge {
+  position:absolute; top:28px; left:0; z-index:10;
+  background:rgba(6,9,9,.9);
+  border:1px solid var(--border);
+  border-radius:14px;
+  padding:16px 20px;
+  backdrop-filter:blur(12px);
+}
+.exp-list { display:flex; flex-direction:column; gap:16px; }
+.exp-item {
+  display:flex; gap:20px; padding:28px;
+  align-items: flex-start;
+  border:1px solid var(--border); border-radius:18px;
+  background:var(--glass); cursor:none;
+  transition:all .4s;
+}
+.exp-item:hover { border-color:rgba(0,251,251,.2); background:rgba(0,251,251,.03); transform:translateX(10px); }
+.exp-icon {
+  width:50px; height:50px; flex-shrink:0;
+  min-width:50px;
+  background:rgba(0,251,251,.07); border-radius:13px;
+  display:flex; align-items:center; justify-content:center;
+  color:var(--cyan); font-size:24px;
+  transition:transform .35s;
+}
+.exp-item:hover .exp-icon { transform:rotate(-12deg) scale(1.12); }
+.exp-item-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:21px; font-weight:600; color:#fff; margin-bottom:6px;
+}
+.exp-item-desc { font-size:13px; color:var(--muted); line-height:1.55; }
+
+/* =============================================
+   CTA BAND
+   ============================================= */
+.cta-wrap { padding:0 56px 130px; position:relative; z-index:1; }
+.cta-box {
+  position:relative;
+  min-height:55vh;
+  display:flex; align-items:center; justify-content:center;
+  overflow:visible;
+  border-radius:36px;
+}
+.cta-bg-img {
+  position:absolute; inset:0;
+  background: url('ship-night.jpg') center/cover;
+  filter:brightness(.28) saturate(.8);
+  border-radius:36px;
+  overflow:hidden;
+}
+.cta-bg-img::after {
+  content:''; position:absolute; inset:0;
+  background:linear-gradient(135deg, rgba(0,251,251,.09) 0%, rgba(6,9,9,.6) 100%);
+}
+.cta-ribbon {
+  position:absolute; top:-1px; left:50%; transform:translateX(-50%);
+  background:var(--cyan); color:var(--bg);
+  font-size:8px; font-weight:700; letter-spacing:.18em; text-transform:uppercase;
+  padding:7px 26px; border-radius:0 0 14px 14px;
+  z-index: 20;
+  white-space: nowrap;
+}
+.cta-content { position:relative; z-index:10; text-align:center; padding:80px 56px; max-width:680px; }
+.cta-title {
+  font-family:'Cormorant Garamond',serif;
+  font-size:clamp(42px,5.5vw,76px);
+  font-weight:600; line-height:1.1; color:#fff; margin-bottom:20px;
+}
+.cta-sub { font-size:16px; color:rgba(255,255,255,.5); line-height:1.65; margin-bottom:48px; }
+.cta-btns { display:flex; gap:14px; justify-content:center; flex-wrap:wrap; margin-bottom:26px; }
+.cta-price {
+  font-family:'Cormorant Garamond',serif;
+  font-size:13px; color:var(--muted);
+  display:flex; align-items:center; justify-content:center; gap:10px;
+}
+.cta-price span { font-size:22px; color:var(--cyan); font-weight:600; }
+
+/* =============================================
+   FOOTER
+   ============================================= */
+.footer-border {
+  width:100%; height:1px;
+  background:var(--border);
+  position:relative; z-index:1;
+}
+footer {
+  position:relative; z-index:1;
+  padding:80px 56px 40px;
+  max-width:1440px; margin:0 auto;
+}
+.foot-grid {
+  display:grid; grid-template-columns:1.6fr 1fr 1fr 1.6fr;
+  gap:60px; margin-bottom:60px;
+}
+.foot-brand {
+  font-family:'Cormorant Garamond',serif;
+  font-size:28px; font-weight:600; letter-spacing:.12em; color:#fff; margin-bottom:16px;
+}
+.foot-bio { font-size:13px; color:var(--muted); line-height:1.65; max-width:220px; margin-bottom:28px; }
+.foot-socials { display:flex; gap:10px; }
+.foot-social {
+  width:36px; height:36px; border-radius:50%;
+  border:1px solid var(--border);
+  display:flex; align-items:center; justify-content:center;
+  color:var(--muted); cursor:none; font-size:16px;
+  transition:all .3s; text-decoration:none;
+}
+.foot-social:hover { border-color:var(--cyan); color:var(--cyan); background:rgba(0,251,251,.06); }
+.foot-heading { font-size:9px; font-weight:700; letter-spacing:.22em; text-transform:uppercase; color:#fff; margin-bottom:24px; }
+.foot-links { list-style:none; display:flex; flex-direction:column; gap:14px; }
+.foot-link {
+  font-size:13px; color:var(--muted); text-decoration:none;
+  display:flex; align-items:center; gap:8px; transition:color .3s;
+}
+.foot-link::before { content:''; width:0; height:1px; background:var(--cyan); transition:width .3s; }
+.foot-link:hover { color:#fff; }
+.foot-link:hover::before { width:14px; }
+.foot-email { background:rgba(255,255,255,.04); border:1px solid var(--border); border-radius:10px; padding:14px 16px; font-size:13px; color:#fff; outline:none; width:100%; margin-bottom:10px; transition:border-color .3s; font-family:inherit; }
+.foot-email:focus { border-color:rgba(0,251,251,.4); }
+.foot-email::placeholder { color:var(--muted); }
+.foot-submit {
+  background:var(--cyan); color:var(--bg); border:none; border-radius:10px; padding:14px;
+  width:100%; font-size:10px; font-weight:700; letter-spacing:.1em; text-transform:uppercase;
+  line-height:1; cursor:none; transition:box-shadow .3s; font-family:inherit;
+  display:flex; align-items:center; justify-content:center;
+}
+.foot-submit:hover { box-shadow:0 0 22px rgba(0,251,251,.4); }
+.foot-bottom { display:flex; justify-content:space-between; align-items:center; padding-top:32px; border-top:1px solid var(--border); }
+.foot-copy { font-size:10px; color:var(--muted); letter-spacing:.06em; }
+.foot-legal { display:flex; gap:24px; }
+.foot-legal a { font-size:10px; color:var(--muted); text-decoration:none; letter-spacing:.06em; transition:color .3s; }
+.foot-legal a:hover { color:#fff; }
+
+/* =============================================
+   RESPONSIVE
+   ============================================= */
+/* =============================================
+   WATER EFFECTS
+   ============================================= */
+
+/* Hero WebGL caustics canvas */
+#waterCanvas {
+  position: absolute;
+  inset: 0;
+  z-index: 6;
+  pointer-events: none;
+  mix-blend-mode: screen;
+  opacity: 0;
+  transition: opacity 1.4s ease;
+}
+#waterCanvas.ready { opacity: 0.85; }
+
+/* Animated SVG wave dividers */
+.wave-sep {
+  position: relative;
+  z-index: 1;
+  height: 72px;
+  overflow: hidden;
+  background: transparent;
+}
+.wave-layer {
+  position: absolute;
+  bottom: 0; left: 0;
+  width: 200%; height: 100%;
+  display: flex;
+}
+.wave-layer svg { width: 50%; height: 100%; flex-shrink: 0; }
+.wave-layer-1 { animation: wave-scroll 14s linear infinite; }
+.wave-layer-2 {
+  animation: wave-scroll 22s linear infinite reverse;
+  bottom: 7px;
+  opacity: 0.65;
+}
+@keyframes wave-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+/* Click water rings */
+.water-ring {
+  position: fixed;
+  border-radius: 50%;
+  pointer-events: none;
+  z-index: 9994;
+  width: 0; height: 0;
+  border: 1.5px solid rgba(0,251,251,.8);
+  transform: translate(-50%, -50%);
+  animation: ring-expand 1.7s cubic-bezier(.2,.65,.35,1) forwards;
+}
+.water-ring.r2 { animation-delay:.16s; border-color:rgba(0,251,251,.4); }
+.water-ring.r3 { animation-delay:.32s; border-color:rgba(0,251,251,.18); }
+@keyframes ring-expand {
+  0%   { width:0;     height:0;     opacity:1; }
+  100% { width:240px; height:240px; opacity:0; }
+}
+
+/* Underwater shimmer on hero fog */
+.hero-fog {
+  animation: fog-shimmer 8s ease-in-out infinite alternate;
+}
+@keyframes fog-shimmer {
+  0%   { opacity: 1; }
+  50%  { opacity: 0.88; }
+  100% { opacity: 1; }
+}
+
+@media(max-width:900px) {
+  #navbar { padding:22px 28px; }
+  #navbar.solid { padding:15px 28px; }
+  .nav-links { display:none; }
+  .hero-inner { padding:0 28px; }
+  .hero-stats { display:none; }
+  .section-wrap { padding:90px 28px; }
+  .bento { grid-template-columns:1fr; }
+  .b-span-7,.b-span-5,.b-span-4,.b-span-8,.b-span-12 { grid-column:span 1; }
+  .b-row-2 { min-height:340px; }
+  .exp-grid { grid-template-columns:1fr; }
+  .exp-inner { padding:90px 28px; }
+  .foot-grid { grid-template-columns:1fr 1fr; gap:40px; }
+  .gallery-header { padding:0 28px; }
+  .car-nav { padding:36px 28px 0; }
+  .gallery-track { padding:0 28px; }
+  .cta-wrap { padding:0 16px 90px; }
+  .cta-box { border-radius:22px; }
+  .cta-bg-img { border-radius:22px; }
+  .cta-content { padding:60px 28px; }
+  footer { padding:60px 28px 36px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Cursor -->
+<div id="cursor"></div>
+<div id="cursor-ring"></div>
+
+<!-- Scroll progress -->
+<div id="scroll-bar"></div>
+
+<!-- Loader -->
+<div id="loader">
+  <div class="loader-brand">AQUAMARINE</div>
+  <div class="loader-track"><div class="loader-fill"></div></div>
+  <div class="loader-num" id="loaderNum">0%</div>
+</div>
+
+<!-- Ambient orbs -->
+<div id="orbs">
+  <div class="orb orb-a"></div>
+  <div class="orb orb-b"></div>
+  <div class="orb orb-c"></div>
+</div>
+
+<!-- ===== NAVBAR ===== -->
+<nav id="navbar">
+  <a href="#" class="nav-logo">AQUAMARINE</a>
+  <ul class="nav-links">
+    <li><a href="#" class="nav-link">Destinations</a></li>
+    <li><a href="#" class="nav-link">Experiences</a></li>
+    <li><a href="#" class="nav-link active">Cabins</a></li>
+    <li><a href="#" class="nav-link">Wellness</a></li>
+  </ul>
+  <button class="nav-btn">Book Voyage</button>
+</nav>
+
+<main>
+
+<!-- ===== HERO ===== -->
+<section class="hero" id="hero">
+  <div class="hero-img" id="heroBg"></div>
+  <div class="hero-fog"></div>
+  <div class="hero-grid"></div>
+  <canvas id="waterCanvas"></canvas>
+
+  <div class="hero-inner">
+    <h1 class="hero-title" id="heroTitle">
+      <span class="title-line"><span class="title-word" id="tw0">Royal</span></span>
+      <span class="title-line"><span class="title-word title-shimmer" id="tw1">Penthouse</span></span>
+    </h1>
+    <p class="hero-sub" id="heroSub">Experience the pinnacle of maritime luxury � 1,200 square feet of masterfully crafted living space, a private wrap-around terrace, and unmatched panoramic views above the endless horizon.</p>
+    <div class="hero-btns" id="heroBtns">
+      <a href="#" class="btn-fill mag">Reserve Now</a>
+      <a href="#" class="btn-ghost mag">Explore Suites</a>
+    </div>
+  </div>
+
+  <div class="hero-stats" id="heroStats">
+    <div><div class="h-stat-num">1,200</div><div class="h-stat-lbl">Sq. Ft.</div></div>
+    <div><div class="h-stat-num">Deck 14</div><div class="h-stat-lbl">Level</div></div>
+    <div><div class="h-stat-num">360�</div><div class="h-stat-lbl">Ocean View</div></div>
+  </div>
+
+  <div class="scroll-hint" id="scrollHint">
+    <div class="scroll-line"></div>
+    <span class="scroll-lbl">Scroll</span>
+  </div>
+</section>
+
+<!-- ===== TICKER ===== -->
+<div class="ticker" style="position:relative;z-index:1;">
+  <div class="ticker-track">
+    <div class="tick-item"><span class="tick-num">47</span><span class="tick-lbl">Luxury Destinations</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">12</span><span class="tick-lbl">Years of Excellence</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">98%</span><span class="tick-lbl">Guest Satisfaction</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">3</span><span class="tick-lbl">World-Class Vessels</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">24/7</span><span class="tick-lbl">Concierge Service</span></div>
+    <div class="tick-sep"></div>
+    <!-- duplicate for seamless -->
+    <div class="tick-item"><span class="tick-num">47</span><span class="tick-lbl">Luxury Destinations</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">12</span><span class="tick-lbl">Years of Excellence</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">98%</span><span class="tick-lbl">Guest Satisfaction</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">3</span><span class="tick-lbl">World-Class Vessels</span></div>
+    <div class="tick-sep"></div>
+    <div class="tick-item"><span class="tick-num">24/7</span><span class="tick-lbl">Concierge Service</span></div>
+    <div class="tick-sep"></div>
+  </div>
+</div>
+
+<!-- ===== BENTO FEATURES ===== -->
+<div class="section-wrap" id="bentoSection">
+  <div class="rv">
+    <div class="sec-label">Exclusive Amenities</div>
+    <h2 class="sec-title">Every detail,&nbsp;<em>perfected</em></h2>
+  </div>
+
+  <div class="bento">
+    <!-- Featured panoramic card -->
+    <div class="bcard bcard-featured b-span-7 b-row-2 rv rv-d1">
+      <div class="bcard-img">
+        <img src="ship-night.jpg" alt="Royal Penthouse">
+      </div>
+      <div class="bcard-inner">
+        <span style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:rgba(0,251,251,.75);margin-bottom:10px;display:block;">Royal Penthouse</span>
+        <h3 style="font-family:'Cormorant Garamond',serif;font-size:36px;color:#fff;font-weight:600;line-height:1.1;margin-bottom:14px;">Where sea meets<br>the extraordinary</h3>
+        <p style="font-size:14px;color:rgba(255,255,255,.45);max-width:420px;line-height:1.65;">Panoramic views, private terrace, and a living space that redefines maritime architecture.</p>
+      </div>
+    </div>
+
+    <!-- Butler stat -->
+    <div class="bcard b-span-5 rv rv-d2">
+      <div class="bcard-inner">
+        <div class="bcard-icon"><span class="material-symbols-outlined">concierge</span></div>
+        <div class="bstat-num" data-count="24">0</div>
+        <p style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;">/7 BUTLER SERVICE</p>
+        <p class="bcard-desc">Your dedicated private butler anticipates every need, around the clock.</p>
+      </div>
+    </div>
+
+    <!-- Deck map -->
+    <div class="bcard b-span-5 rv rv-d3">
+      <div class="bcard-inner">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:22px;">
+          <div>
+            <h3 class="bcard-title">Deck Plan</h3>
+            <p class="bcard-desc">Penthouse Level � Deck 14</p>
+          </div>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.15em;text-transform:uppercase;color:var(--cyan);padding:6px 14px;border:1px solid rgba(0,251,251,.2);border-radius:100px;white-space:nowrap;">? LIVE</span>
+        </div>
+        <div style="flex:1;display:flex;align-items:center;justify-content:center;">
+          <div style="width:100%;aspect-ratio:2/1;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:14px;position:relative;overflow:hidden;padding:14px;">
+            <div style="position:absolute;inset:0;opacity:.05;background-image:radial-gradient(rgba(0,251,251,1) 1px,transparent 1px);background-size:14px 14px;"></div>
+            <div style="position:relative;width:100%;height:100%;border:1px solid rgba(0,251,251,.14);border-radius:80px;display:flex;align-items:center;justify-content:space-around;padding:0 20px;">
+              <div style="width:21%;height:68%;border:1px solid rgba(255,255,255,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.28);text-align:center;line-height:1.5;">SUITE<br>1401</div>
+              <div style="width:29%;height:88%;border:1px solid rgba(0,251,251,.45);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;letter-spacing:.1em;color:rgba(0,251,251,.8);text-align:center;line-height:1.5;background:rgba(0,251,251,.05);box-shadow:0 0 22px rgba(0,251,251,.15),inset 0 0 20px rgba(0,251,251,.04);">ROYAL<br>PENTHOUSE</div>
+              <div style="width:21%;height:68%;border:1px solid rgba(255,255,255,.12);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:700;letter-spacing:.1em;color:rgba(255,255,255,.28);text-align:center;line-height:1.5;">SUITE<br>1403</div>
+            </div>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:18px;flex-wrap:wrap;">
+          <span style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(0,251,251,.75);padding:6px 14px;background:rgba(0,251,251,.07);border:1px solid rgba(0,251,251,.14);border-radius:100px;cursor:none;">Full Deck</span>
+          <span style="font-size:8px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.35);padding:6px 14px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);border-radius:100px;cursor:none;">Overview</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Three amenity cards -->
+    <div class="bcard b-span-4 rv rv-d1">
+      <div class="bcard-inner">
+        <div class="bcard-icon"><span class="material-symbols-outlined">window</span></div>
+        <h3 class="bcard-title">Panoramic Windows</h3>
+        <p class="bcard-desc">Floor-to-ceiling glass. Uninterrupted ocean at every angle.</p>
+      </div>
+    </div>
+    <div class="bcard b-span-4 rv rv-d2">
+      <div class="bcard-inner">
+        <div class="bcard-icon"><span class="material-symbols-outlined">restaurant</span></div>
+        <h3 class="bcard-title">In-Suite Dining</h3>
+        <p class="bcard-desc">Michelin-inspired menus crafted fresh by your personal chef.</p>
+      </div>
+    </div>
+    <div class="bcard b-span-4 rv rv-d3">
+      <div class="bcard-inner">
+        <div class="bcard-icon"><span class="material-symbols-outlined">spa</span></div>
+        <h3 class="bcard-title">Wellness Suite</h3>
+        <p class="bcard-desc">Private spa rituals and curated wellness programs on board.</p>
+      </div>
+    </div>
+
+    <!-- Pricing card -->
+    <div class="bcard b-span-12 rv" style="background:linear-gradient(135deg,rgba(0,251,251,.07),rgba(0,251,251,.02));border-color:rgba(0,251,251,.14);">
+      <div class="bcard-inner" style="flex-direction:row;align-items:center;justify-content:space-between;gap:28px;">
+        <div>
+          <span style="font-size:9px;font-weight:700;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:12px;">Starting From</span>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:62px;font-weight:600;color:#fff;line-height:1;">$12,500<span style="font-size:22px;color:var(--muted);"> /pp</span></div>
+          <p style="font-size:13px;color:var(--muted);margin-top:8px;">7-night minimum � All-inclusive � Private airport transfer</p>
+        </div>
+        <a href="#" class="btn-fill mag" style="flex-shrink:0;white-space:nowrap;">Reserve Penthouse</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="wave-sep">
+  <div class="wave-layer wave-layer-1">
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C180,58 360,14 540,36 C720,58 900,14 1080,36 C1260,58 1350,46 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.08)"/>
+    </svg>
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C180,58 360,14 540,36 C720,58 900,14 1080,36 C1260,58 1350,46 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.08)"/>
+    </svg>
+  </div>
+  <div class="wave-layer wave-layer-2">
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C180,14 360,58 540,36 C720,14 900,58 1080,36 C1260,14 1350,26 1440,36 L1440,72 L0,72 Z" fill="rgba(177,200,233,0.05)"/>
+    </svg>
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C180,14 360,58 540,36 C720,14 900,58 1080,36 C1260,14 1350,26 1440,36 L1440,72 L0,72 Z" fill="rgba(177,200,233,0.05)"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ===== SUITE GALLERY ===== -->
+<section class="gallery-section">
+  <div class="gallery-header rv">
+    <div class="sec-label">Suite Collection</div>
+    <h2 class="sec-title">Choose Your <em>Sanctuary</em></h2>
+    <p style="font-size:16px;color:var(--muted);max-width:480px;margin-top:16px;line-height:1.65;">Each stateroom, a masterpiece of maritime design balancing intimate comfort with the vastness of the open sea.</p>
+  </div>
+
+  <div class="gallery-wrap">
+    <div class="gallery-track" id="galTrack">
+      <div class="suite-card">
+        <img src="ship-aerial.jpg" alt="Royal Penthouse">
+        <div class="suite-fog"></div>
+        <div class="suite-body">
+          <span class="suite-tag">Premium</span>
+          <h3 class="suite-name">Royal Penthouse</h3>
+          <p class="suite-desc">1,200 sq ft of private paradise above the ocean.</p>
+          <div class="suite-row">
+            <span class="suite-price">From $12,500 /pp</span>
+            <div class="suite-arrow"><span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="suite-card">
+        <img src="ship-night.jpg" alt="Signature Suite">
+        <div class="suite-fog"></div>
+        <div class="suite-body">
+          <span class="suite-tag">Most Popular</span>
+          <h3 class="suite-name">Signature Suite</h3>
+          <p class="suite-desc">Master bedroom, living area, and private balcony.</p>
+          <div class="suite-row">
+            <span class="suite-price">From $4,200 /pp</span>
+            <div class="suite-arrow"><span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="suite-card">
+        <img src="ship-deck.jpg" alt="Veranda Stateroom">
+        <div class="suite-fog"></div>
+        <div class="suite-body">
+          <span class="suite-tag">Essential Luxury</span>
+          <h3 class="suite-name">Veranda Stateroom</h3>
+          <p class="suite-desc">Elegant space with a private ocean-view veranda.</p>
+          <div class="suite-row">
+            <span class="suite-price">From $2,800 /pp</span>
+            <div class="suite-arrow"><span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="suite-card">
+        <img src="ship-aerial.jpg" alt="Deluxe Ocean Suite">
+        <div class="suite-fog"></div>
+        <div class="suite-body">
+          <span class="suite-tag">Spacious Comfort</span>
+          <h3 class="suite-name">Deluxe Ocean Suite</h3>
+          <p class="suite-desc">Double-width balcony and separate vanity retreat.</p>
+          <div class="suite-row">
+            <span class="suite-price">From $6,100 /pp</span>
+            <div class="suite-arrow"><span class="material-symbols-outlined" style="font-size:18px;">arrow_forward</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="car-nav rv">
+    <button class="car-btn" id="carPrev"><span class="material-symbols-outlined">arrow_back</span></button>
+    <button class="car-btn" id="carNext"><span class="material-symbols-outlined">arrow_forward</span></button>
+    <div class="car-dots" id="carDots">
+      <div class="car-dot on"></div>
+      <div class="car-dot"></div>
+      <div class="car-dot"></div>
+      <div class="car-dot"></div>
+    </div>
+  </div>
+</section>
+
+<div class="wave-sep">
+  <div class="wave-layer wave-layer-1">
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C240,56 480,16 720,36 C960,56 1200,16 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.07)"/>
+    </svg>
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C240,56 480,16 720,36 C960,56 1200,16 1440,36 L1440,72 L0,72 Z" fill="rgba(0,251,251,0.07)"/>
+    </svg>
+  </div>
+  <div class="wave-layer wave-layer-2">
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C240,16 480,56 720,36 C960,16 1200,56 1440,36 L1440,72 L0,72 Z" fill="rgba(255,183,125,0.04)"/>
+    </svg>
+    <svg viewBox="0 0 1440 72" xmlns="http://www.w3.org/2000/svg" preserveAspectRatio="none">
+      <path d="M0,36 C240,16 480,56 720,36 C960,16 1200,56 1440,36 L1440,72 L0,72 Z" fill="rgba(255,183,125,0.04)"/>
+    </svg>
+  </div>
+</div>
+
+<!-- ===== EXPERIENCES ===== -->
+<div class="exp-section">
+  <div class="exp-inner">
+    <div class="rv">
+      <div class="sec-label">On Board</div>
+      <h2 class="sec-title">Beyond the <em>cabin door</em></h2>
+    </div>
+    <div class="exp-grid">
+      <div class="exp-visual rv from-left">
+        <img class="exp-img-a" id="expA" src="ship-deck.jpg" alt="Ship Deck">
+        <img class="exp-img-b" id="expB" src="ship-night.jpg" alt="Ship Night">
+        <div class="exp-badge rv">
+          <div style="font-size:10px;color:var(--muted);margin-bottom:5px;font-weight:600;letter-spacing:.05em;">Award Winning</div>
+          <div style="font-family:'Cormorant Garamond',serif;font-size:19px;color:#fff;font-weight:600;">Best Luxury Cruise 2026</div>
+        </div>
+      </div>
+      <div class="exp-list">
+        <div class="exp-item rv rv-d1">
+          <div class="exp-icon"><span class="material-symbols-outlined">waves</span></div>
+          <div>
+            <h3 class="exp-item-title">Private Infinity Pool</h3>
+            <p class="exp-item-desc">Deck 15 exclusive access. Sunrise swims above the Atlantic, surrounded only by sky.</p>
+          </div>
+        </div>
+        <div class="exp-item rv rv-d2">
+          <div class="exp-icon"><span class="material-symbols-outlined">local_dining</span></div>
+          <div>
+            <h3 class="exp-item-title">Culinary Voyages</h3>
+            <p class="exp-item-desc">Seven specialty restaurants. Port-to-port menus reflecting each destination's soul.</p>
+          </div>
+        </div>
+        <div class="exp-item rv rv-d3">
+          <div class="exp-icon"><span class="material-symbols-outlined">nightlife</span></div>
+          <div>
+            <h3 class="exp-item-title">Horizon Lounge</h3>
+            <p class="exp-item-desc">Private bar atop the ship. Craft cocktails at the edge of the world.</p>
+          </div>
+        </div>
+        <div class="exp-item rv rv-d4">
+          <div class="exp-icon"><span class="material-symbols-outlined">anchor</span></div>
+          <div>
+            <h3 class="exp-item-title">Shore Excursions</h3>
+            <p class="exp-item-desc">Curated private tours in each port � Santorini, the Norwegian fjords, and beyond.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== CTA ===== -->
+<div class="cta-wrap">
+  <div class="cta-box rv scale">
+    <div class="cta-bg-img"></div>
+    <div class="cta-ribbon">Limited Availability � 2026 Season</div>
+    <div class="cta-content">
+      <h2 class="cta-title">Your next chapter begins beyond the horizon</h2>
+      <p class="cta-sub">The 2026 season has very limited Royal Penthouse availability. Secure your voyage or join the priority waitlist.</p>
+      <div class="cta-btns">
+        <a href="#" class="btn-fill mag">Secure Your Voyage</a>
+        <a href="#" class="btn-ghost mag">Join Waitlist</a>
+      </div>
+      <div class="cta-price">From <span>$12,500</span> per person � 7 nights</div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- ===== FOOTER ===== -->
+<div class="footer-border"></div>
+<footer>
+  <div class="foot-grid">
+    <div>
+      <div class="foot-brand">AQUAMARINE</div>
+      <p class="foot-bio">Pioneering the future of luxury maritime exploration. Beyond the horizon lies a new standard of serenity.</p>
+      <div class="foot-socials">
+        <a href="#" class="foot-social"><span class="material-symbols-outlined" style="font-size:15px;">language</span></a>
+        <a href="#" class="foot-social"><span class="material-symbols-outlined" style="font-size:15px;">photo_camera</span></a>
+        <a href="#" class="foot-social"><span class="material-symbols-outlined" style="font-size:15px;">group</span></a>
+      </div>
+    </div>
+    <div>
+      <h4 class="foot-heading">Explore</h4>
+      <ul class="foot-links">
+        <li><a href="#" class="foot-link">Destinations</a></li>
+        <li><a href="#" class="foot-link">Our Fleet</a></li>
+        <li><a href="#" class="foot-link">Experiences</a></li>
+        <li><a href="#" class="foot-link">Itineraries</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="foot-heading">Company</h4>
+      <ul class="foot-links">
+        <li><a href="#" class="foot-link">Sustainability</a></li>
+        <li><a href="#" class="foot-link">Careers</a></li>
+        <li><a href="#" class="foot-link">Press Kit</a></li>
+        <li><a href="#" class="foot-link">Contact</a></li>
+      </ul>
+    </div>
+    <div>
+      <h4 class="foot-heading">Newsletter</h4>
+      <p style="font-size:13px;color:var(--muted);margin-bottom:18px;line-height:1.6;">First access to new voyages, exclusive offers, and maritime stories.</p>
+      <input class="foot-email" type="email" placeholder="Your email address">
+      <button class="foot-submit">Subscribe</button>
+    </div>
+  </div>
+  <div class="foot-bottom">
+    <p class="foot-copy">� 2026 AQUAMARINE MARITIME VENTURES. ALL RIGHTS RESERVED.</p>
+    <div class="foot-legal">
+      <a href="#">Privacy</a>
+      <a href="#">Terms</a>
+      <a href="#">Cookies</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+// ============================================================
+// LOADER
+// ============================================================
+(function() {
+  const loader = document.getElementById('loader');
+  const numEl  = document.getElementById('loaderNum');
+  let count = 0;
+  const tick = setInterval(() => {
+    count = Math.min(count + Math.floor(Math.random() * 8) + 2, 100);
+    numEl.textContent = count + '%';
+    if (count >= 100) clearInterval(tick);
+  }, 60);
+
+  window.addEventListener('load', () => {
+    setTimeout(() => {
+      loader.classList.add('hide');
+      setTimeout(() => loader.style.display = 'none', 1100);
+
+      // Title words slide up
+      setTimeout(() => document.getElementById('tw0').classList.add('visible'), 400);
+      setTimeout(() => document.getElementById('tw1').classList.add('visible'), 650);
+
+      const sub = document.getElementById('heroSub');
+      sub.style.transition = 'opacity .8s ease, transform .8s ease';
+      setTimeout(() => { sub.style.opacity = 1; sub.style.transform = 'translateY(0)'; }, 950);
+
+      const btns = document.getElementById('heroBtns');
+      btns.style.transition = 'opacity .8s ease, transform .8s ease';
+      setTimeout(() => { btns.style.opacity = 1; btns.style.transform = 'translateY(0)'; }, 1200);
+
+      const stats = document.getElementById('heroStats');
+      stats.style.transition = 'opacity .8s ease, transform .8s ease';
+      setTimeout(() => { stats.style.opacity = 1; stats.style.transform = 'translateX(0)'; }, 1450);
+
+      const hint = document.getElementById('scrollHint');
+      hint.style.transition = 'opacity .6s ease';
+      setTimeout(() => { hint.style.opacity = 1; }, 1900);
+    }, 2400);
+  });
+})();
+
+// ============================================================
+// CUSTOM CURSOR
+// ============================================================
+const cursor = document.getElementById('cursor');
+const ring   = document.getElementById('cursor-ring');
+let mx = 0, my = 0, rx = 0, ry = 0;
+
+document.addEventListener('mousemove', e => {
+  mx = e.clientX; my = e.clientY;
+  cursor.style.left = mx + 'px';
+  cursor.style.top  = my + 'px';
+});
+
+(function animRing() {
+  rx += (mx - rx) * .11;
+  ry += (my - ry) * .11;
+  ring.style.left = rx + 'px';
+  ring.style.top  = ry + 'px';
+  requestAnimationFrame(animRing);
+})();
+
+document.querySelectorAll('a, button, .suite-card, .exp-item, .bcard').forEach(el => {
+  el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
+  el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
+});
+
+// ============================================================
+// SCROLL PROGRESS + NAVBAR
+// ============================================================
+const scrollBar = document.getElementById('scroll-bar');
+const navbar    = document.getElementById('navbar');
+
+window.addEventListener('scroll', () => {
+  const pct = (window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100;
+  scrollBar.style.width = pct + '%';
+  navbar.classList.toggle('solid', window.scrollY > 60);
+}, { passive: true });
+
+// ============================================================
+// HERO PARALLAX
+// ============================================================
+const heroBg = document.getElementById('heroBg');
+window.addEventListener('scroll', () => {
+  if (window.scrollY < window.innerHeight) {
+    heroBg.style.transform = `translateY(${window.scrollY * .38}px) scale(1.14)`;
+  }
+}, { passive: true });
+
+// ============================================================
+// SCROLL REVEAL
+// ============================================================
+const rvObs = new IntersectionObserver(entries => {
+  entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+}, { threshold: .12, rootMargin: '0px 0px -50px 0px' });
+document.querySelectorAll('.rv').forEach(el => rvObs.observe(el));
+
+// ============================================================
+// BENTO CARD MOUSE GLOW + 3D TILT
+// ============================================================
+document.querySelectorAll('.bcard').forEach(card => {
+  card.addEventListener('mousemove', e => {
+    const r = card.getBoundingClientRect();
+    const x = ((e.clientX - r.left) / r.width) * 100;
+    const y = ((e.clientY - r.top)  / r.height) * 100;
+    card.style.setProperty('--mx', x + '%');
+    card.style.setProperty('--my', y + '%');
+    // tilt for featured
+    if (card.classList.contains('bcard-featured')) {
+      const tx = ((e.clientY - r.top)  / r.height - .5) * -8;
+      const ty = ((e.clientX - r.left) / r.width  - .5) * 8;
+      card.style.transform = `perspective(1000px) rotateX(${tx}deg) rotateY(${ty}deg) translateY(-5px)`;
+    }
+  });
+  card.addEventListener('mouseleave', () => {
+    card.style.transform = '';
+    card.style.transition = 'transform .6s cubic-bezier(.25,.46,.45,.94), border-color .4s, box-shadow .4s';
+    setTimeout(() => card.style.transition = '', 600);
+  });
+});
+
+// ============================================================
+// SUITE CAROUSEL
+// ============================================================
+const galTrack = document.getElementById('galTrack');
+const dotEls   = document.querySelectorAll('.car-dot');
+const CARD_W   = 390 + 22; // width + gap
+let slide = 0;
+const total = document.querySelectorAll('.suite-card').length;
+
+function setSlide(n) {
+  slide = (n + total) % total;
+  galTrack.style.transform = `translateX(${-slide * CARD_W}px)`;
+  dotEls.forEach((d, i) => d.classList.toggle('on', i === slide));
+}
+document.getElementById('carNext').addEventListener('click', () => setSlide(slide + 1));
+document.getElementById('carPrev').addEventListener('click', () => setSlide(slide - 1));
+dotEls.forEach((d, i) => d.addEventListener('click', () => setSlide(i)));
+
+// ============================================================
+// EXPERIENCE PARALLAX IMAGES
+// ============================================================
+const expA = document.getElementById('expA');
+const expB = document.getElementById('expB');
+window.addEventListener('scroll', () => {
+  if (!expA) return;
+  const vis = expA.closest('.exp-visual');
+  if (!vis) return;
+  const rect = vis.getBoundingClientRect();
+  const offset = (window.innerHeight / 2 - rect.top - rect.height / 2) / window.innerHeight;
+  expA.style.transform = `translateY(${offset * 28}px)`;
+  expB.style.transform = `translateY(${offset * -18}px)`;
+}, { passive: true });
+
+// ============================================================
+// MAGNETIC BUTTONS
+// ============================================================
+document.querySelectorAll('.mag').forEach(btn => {
+  btn.addEventListener('mousemove', e => {
+    const r = btn.getBoundingClientRect();
+    const x = e.clientX - r.left - r.width  / 2;
+    const y = e.clientY - r.top  - r.height / 2;
+    btn.style.transform = `translate(${x * .28}px, ${y * .28}px)`;
+  });
+  btn.addEventListener('mouseleave', () => {
+    btn.style.transition = 'transform .55s cubic-bezier(.25,.46,.45,.94), box-shadow .3s';
+    btn.style.transform = '';
+    setTimeout(() => btn.style.transition = '', 550);
+  });
+});
+
+// ============================================================
+// ANIMATED COUNTERS
+// ============================================================
+function countUp(el, target) {
+  let v = 0;
+  const step = target / 55;
+  const t = setInterval(() => {
+    v = Math.min(v + step, target);
+    el.textContent = Math.floor(v);
+    if (v >= target) clearInterval(t);
+  }, 16);
+}
+const cntObs = new IntersectionObserver(entries => {
+  entries.forEach(e => {
+    if (e.isIntersecting) {
+      countUp(e.target, +e.target.dataset.count);
+      cntObs.unobserve(e.target);
+    }
+  });
+}, { threshold: .5 });
+document.querySelectorAll('[data-count]').forEach(el => cntObs.observe(el));
+
+// ============================================================
+// WEBGL WATER CAUSTICS ON HERO
+// ============================================================
+(function initWaterGL() {
+  const canvas = document.getElementById('waterCanvas');
+  const hero   = document.getElementById('hero');
+
+  const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
+  if (!gl) return;
+
+  function resize() {
+    canvas.width  = hero.clientWidth;
+    canvas.height = hero.clientHeight;
+    gl.viewport(0, 0, canvas.width, canvas.height);
+  }
+  resize();
+  window.addEventListener('resize', resize);
+
+  /* ---------- Vertex shader (full-screen quad) ---------- */
+  const VS = `
+    attribute vec2 a_pos;
+    void main() { gl_Position = vec4(a_pos, 0.0, 1.0); }
+  `;
+
+  /* ---------- Fragment shader: animated caustic light ---------- */
+  const FS = `
+    precision mediump float;
+    uniform float u_time;
+    uniform vec2  u_mouse;   /* 0..1 normalised, y flipped */
+    uniform vec2  u_res;
+    uniform float u_active;  /* 0..1 mouse presence */
+
+    /* ---- value noise ---- */
+    float hash(vec2 p) {
+      return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453);
+    }
+    float vnoise(vec2 p) {
+      vec2 i = floor(p), f = fract(p);
+      vec2 u = f * f * (3.0 - 2.0 * f);
+      return mix(
+        mix(hash(i), hash(i + vec2(1,0)), u.x),
+        mix(hash(i + vec2(0,1)), hash(i + vec2(1,1)), u.x), u.y);
+    }
+    float fbm(vec2 p) {
+      float v = 0.0, a = 0.5;
+      for (int i = 0; i < 5; i++) { v += a * vnoise(p); p *= 2.07; a *= 0.5; }
+      return v;
+    }
+
+    void main() {
+      vec2 uv = gl_FragCoord.xy / u_res;
+      float ar = u_res.x / u_res.y;
+      vec2  p  = vec2(uv.x * ar, uv.y);
+      float t  = u_time * 0.20;
+
+      /* Multi-layer wave interference */
+      float w = 0.0;
+      w += sin(p.x * 7.0  + t * 1.5  + sin(p.y * 4.5  + t * 0.9) * 2.4) * 0.22;
+      w += sin(p.y * 9.5  + t * 1.1  + sin(p.x * 6.0  + t * 1.6) * 2.0) * 0.17;
+      w += sin((p.x + p.y) * 6.0 + t * 1.8) * 0.11;
+      w += sin(p.x * 13.0 - t * 2.2  + sin(p.y * 11.0 + t * 1.3) * 1.6) * 0.07;
+      w += (fbm(p * 2.8 + vec2(t * 0.30, t * 0.24)) - 0.5) * 0.28;
+
+      /* Mouse interactive ripple */
+      vec2  m  = vec2(u_mouse.x * ar, u_mouse.y);
+      float md = length(p - m);
+      w += sin(md * 38.0 - u_time * 5.5) * exp(-md * 5.0) * u_active * 0.42;
+
+      /* Caustic bright bands */
+      float c1 = pow(abs(cos(w * 13.0)), 7.0);
+      float c2 = pow(max(0.0, sin(w * 7.0 + 0.4)), 5.0) * 0.55;
+      float caustic = c1 + c2;
+
+      /* Colour: cyan ? ice-white */
+      vec3 cCyan  = vec3(0.0,  0.92, 0.96);
+      vec3 cWhite = vec3(0.88, 1.0,  1.0);
+      vec3 col    = mix(cCyan, cWhite, caustic * 0.75);
+
+      /* Alpha: mostly caustic, slight wave tint */
+      float alpha = caustic * 0.20 + abs(w) * 0.032;
+
+      /* Edge fade masks */
+      float vMask = smoothstep(0.0, 0.18, uv.y) * smoothstep(1.0, 0.48, uv.y);
+      float hMask = smoothstep(0.0, 0.06, uv.x) * smoothstep(1.0, 0.94, uv.x);
+      alpha *= vMask * hMask;
+
+      gl_FragColor = vec4(col, clamp(alpha, 0.0, 0.38));
+    }
+  `;
+
+  function mkShader(type, src) {
+    const s = gl.createShader(type);
+    gl.shaderSource(s, src); gl.compileShader(s); return s;
+  }
+  const prog = gl.createProgram();
+  gl.attachShader(prog, mkShader(gl.VERTEX_SHADER,   VS));
+  gl.attachShader(prog, mkShader(gl.FRAGMENT_SHADER, FS));
+  gl.linkProgram(prog);
+  gl.useProgram(prog);
+
+  /* Full-screen quad */
+  const buf = gl.createBuffer();
+  gl.bindBuffer(gl.ARRAY_BUFFER, buf);
+  gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([-1,-1, 1,-1, -1,1, 1,1]), gl.STATIC_DRAW);
+  const aPos = gl.getAttribLocation(prog, 'a_pos');
+  gl.enableVertexAttribArray(aPos);
+  gl.vertexAttribPointer(aPos, 2, gl.FLOAT, false, 0, 0);
+
+  const uTime   = gl.getUniformLocation(prog, 'u_time');
+  const uMouse  = gl.getUniformLocation(prog, 'u_mouse');
+  const uRes    = gl.getUniformLocation(prog, 'u_res');
+  const uActive = gl.getUniformLocation(prog, 'u_active');
+
+  gl.enable(gl.BLEND);
+  gl.blendFunc(gl.SRC_ALPHA, gl.ONE); /* additive � brightens image */
+
+  let mouseX = 0.5, mouseY = 0.5;
+  let targetActive = 0, currentActive = 0;
+
+  hero.addEventListener('mousemove', e => {
+    const r = hero.getBoundingClientRect();
+    mouseX = (e.clientX - r.left) / r.width;
+    mouseY = 1.0 - (e.clientY - r.top)  / r.height;
+    targetActive = 1.0;
+  });
+  hero.addEventListener('mouseleave', () => { targetActive = 0.0; });
+
+  /* Fade in once loader hides */
+  setTimeout(() => canvas.classList.add('ready'), 2600);
+
+  const t0 = performance.now();
+  (function frame() {
+    const elapsed = (performance.now() - t0) / 1000;
+    currentActive += (targetActive - currentActive) * 0.04;
+
+    gl.viewport(0, 0, canvas.width, canvas.height);
+    gl.clear(gl.COLOR_BUFFER_BIT);
+    gl.uniform1f(uTime,   elapsed);
+    gl.uniform2f(uMouse,  mouseX, mouseY);
+    gl.uniform2f(uRes,    canvas.width, canvas.height);
+    gl.uniform1f(uActive, currentActive);
+    gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+    requestAnimationFrame(frame);
+  })();
+})();
+
+// ============================================================
+// WATER RING RIPPLE ON CLICK
+// ============================================================
+document.addEventListener('click', e => {
+  [0, 1, 2].forEach(i => {
+    const el = document.createElement('div');
+    el.className = 'water-ring' + (i > 0 ? ' r' + (i + 1) : '');
+    el.style.left = e.clientX + 'px';
+    el.style.top  = e.clientY + 'px';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 2000);
+  });
+});
+</script>
+</body>
+</html>
